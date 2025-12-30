@@ -216,6 +216,47 @@ def main():
                 "text/csv",
                 key='download-csv'
             )
+        
+        # --- Recommended Email Template ---
+        st.markdown("---")
+        st.subheader("📧 Recommended Introduction Email Template")
+        st.markdown("Use this template as a starting point for your LP outreach:")
+        
+        email_template = """Subject: Introduction - [Your Fund Name] - [Brief Value Proposition]
+
+Dear [LP Name],
+
+I hope this message finds you well. I'm reaching out because [Your Fund Name] aligns with [Firm Name]'s investment focus in [relevant industry/focus area].
+
+**About [Your Fund Name]:**
+[Brief 2-3 sentence description of your fund, strategy, and key differentiators]
+
+**Why This May Be of Interest:**
+- [Specific reason 1 related to their investment criteria/interests]
+- [Specific reason 2 related to their portfolio or focus areas]
+- [Specific reason 3 - track record, unique opportunity, etc.]
+
+I would welcome the opportunity to discuss how [Your Fund Name] might fit within [Firm Name]'s portfolio. Would you be available for a brief call in the coming weeks?
+
+Thank you for your consideration, and I look forward to the possibility of connecting.
+
+Best regards,
+[Your Name]
+[Your Title]
+[Your Fund Name]
+[Your Contact Information]"""
+        
+        st.text_area(
+            "Email Template",
+            email_template,
+            height=400,
+            help="Copy and customize this template for your outreach. Remember to personalize each email based on the specific LP's interests and background."
+        )
+        
+        # Copy button functionality
+        if st.button("📋 Copy Email Template"):
+            st.code(email_template, language=None)
+            st.success("Template displayed above. Select and copy the text to use it.")
 
 if __name__ == "__main__":
     main()
