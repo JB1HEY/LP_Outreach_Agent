@@ -169,7 +169,7 @@ def main():
                 
                 if not results:
                     status.update(label="Discovery Complete - No Results Found", state="error")
-                    st.warming("No LPs found matching your criteria. Try broadening your search.")
+                    st.warning("No LPs found matching your criteria. Try broadening your search.")
                 else:
                     status.update(label="Discovery Complete!", state="complete")
                     st.success(f"Found {len(results)} potential investors!")
