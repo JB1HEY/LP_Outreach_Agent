@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.env
+.DS_Store
+lp_database.csv
+daily_targets_*.csv
+daily_targets_report_*.md
+video/
+*.png
+*.jpg
