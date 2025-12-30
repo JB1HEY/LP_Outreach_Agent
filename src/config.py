@@ -14,6 +14,13 @@ load_dotenv()
 @dataclass
 class InvestmentCriteria:
     """Defines the investment criteria for LP search"""
+    # Dynamic Toggles
+    use_ebitda: bool = True
+    use_revenue: bool = True
+    use_industries: bool = True
+    use_preferences: bool = True
+    
+    # Values
     ebitda_range: Tuple[float, float] = (1, 5)  # in millions
     revenue_range: Tuple[float, float] = (20, 150)  # in millions
     industries: List[str] = field(default_factory=list)

@@ -8,3 +8,4 @@ daily_targets_report_*.md
 video/
 *.png
 *.jpg
+.streamlit/secrets.toml

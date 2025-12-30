@@ -2,7 +2,8 @@
 LP Discovery Engine using Gemini API
 Automatically discovers and categorizes Limited Partners based on investment criteria
 """
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from typing import List, Dict, Optional
 import json
 import re
@@ -13,12 +14,9 @@ class LPDiscoveryEngine:
     
     def __init__(self, api_key: str):
         """Initialize the discovery engine with Gemini API key"""
-        # Use the correct google-generativeai SDK configuration
-        # Assuming version >= 0.3.0 which supports api_key param
-        genai.configure(api_key=api_key)
-        
-        # Use Gemini 2.0 Flash as determined in testing
-        self.model = genai.GenerativeModel('gemini-2.0-flash')
+        # Configure the new google.genai Client
+        self.client = genai.Client(api_key=api_key)
+        self.model_name = 'gemini-2.0-flash'
         
     def search_lps(self, criteria: InvestmentCriteria, config: SearchConfig) -> List[Dict]:
         """
@@ -48,15 +46,19 @@ class LPDiscoveryEngine:
         """Generate targeted search queries based on criteria and categories"""
         queries = []
         
-        # Build criteria description
-        criteria_desc = f"""
-Investment Criteria:
-- EBITDA Range: ${criteria.ebitda_range[0]}M - ${criteria.ebitda_range[1]}M
-- Revenue Range: ${criteria.revenue_range[0]}M - ${criteria.revenue_range[1]}M
-- Preferences: {', '.join(criteria.preferences)}
-"""
+        # Build criteria description dynamically based on toggles
+        criteria_desc = "Investment Criteria:\n"
         
-        if criteria.industries:
+        if criteria.use_ebitda:
+            criteria_desc += f"- EBITDA Range: ${criteria.ebitda_range[0]}M - ${criteria.ebitda_range[1]}M\n"
+            
+        if criteria.use_revenue:
+            criteria_desc += f"- Revenue Range: ${criteria.revenue_range[0]}M - ${criteria.revenue_range[1]}M\n"
+            
+        if criteria.use_preferences and criteria.preferences:
+            criteria_desc += f"- Preferences: {', '.join(criteria.preferences)}\n"
+        
+        if criteria.use_industries and criteria.industries:
             criteria_desc += f"- Industries: {', '.join(criteria.industries)}\n"
         
         if criteria.company_targets:
@@ -136,8 +138,8 @@ Please provide a list of 10-15 family offices with:
 Format the response as a JSON array of objects."""
                 })
         
-        # Industry-specific searches if specified
-        if criteria.industries and config.search_depth == "comprehensive":
+        # Industry-specific searches if specified and enabled matches
+        if criteria.use_industries and criteria.industries and config.search_depth == "comprehensive":
             for industry in criteria.industries[:3]:  # Limit to top 3 industries
                 queries.append({
                     'category': 'Mixed',
@@ -161,7 +163,10 @@ Format the response as a JSON array of objects."""
     def _execute_search(self, prompt: str, category: str, criteria: InvestmentCriteria) -> List[Dict]:
         """Execute a single search query using Gemini API"""
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt
+            )
             
             # Extract and parse JSON from response
             lps = self._parse_gemini_response(response.text, category)

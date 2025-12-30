@@ -5,7 +5,8 @@ Tests configuration loading and API connectivity
 import sys
 import os
 from src.config import load_config
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 def test_config():
     print("Testing configuration loading...")
@@ -25,14 +26,16 @@ def test_api_connectivity():
     print("\nTesting Gemini API connectivity...")
     try:
         search_config, _ = load_config()
-        genai.configure(api_key=search_config.gemini_api_key)
+        client = genai.Client(api_key=search_config.gemini_api_key)
         
         # Using Gemini 2.0 Flash as determined earlier
         model_name = 'gemini-2.0-flash'
         print(f"Connecting to {model_name}...")
         
-        model = genai.GenerativeModel(model_name)
-        response = model.generate_content("Hello, are you online?")
+        response = client.models.generate_content(
+            model=model_name,
+            contents="Hello, are you online?"
+        )
         
         if response.text:
             print(f"✓ API Connected! Response: {response.text.strip()[:30]}...")
